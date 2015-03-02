@@ -42,9 +42,124 @@
 
     </dependencies>
 
+    <pluginRepositories>
+        <!-- Configure Sonatype OSS Maven snapshots repository -->
+        <pluginRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
 
     <build>
         <finalName>${project.artifactId}</finalName>
+
+        <plugins>
+            <!--
+             * Just used for local testing!
+             * simply start the app with mvn tomee:run
+            -->
+            <plugin>
+                <groupId>org.apache.openejb.maven</groupId>
+                <artifactId>tomee-maven-plugin</artifactId>
+                <version>${tomee.version}</version>
+                <configuration>
+                    <tomeeVersion>${tomee.version}</tomeeVersion>
+                    <tomeeClassifier>${tomee.classifier}</tomeeClassifier>
+                    <synchronization>
+                        <extensions>
+                            <extension>.class</extension>
+                            <extension>.properties</extension>
+                            <!-- monitor css files for daniel valda -->
+                            <extension>.css</extension>
+                            <!-- if you want to update each time you build with mvn compile -->
+                        </extensions>
+                        <updateInterval>2</updateInterval>
+                    </synchronization>
+                    <!-- important: for some reason, this has to be false, else reloading does not work! -->
+                    <reloadOnUpdate>false</reloadOnUpdate>
+                    <!-- removed the .war extension from the "warFile" property, so we can use exploded archives -->
+                    <warFile>${project.build.directory}/${project.build.finalName}</warFile>
+                    <!-- path that is used by tomEE in the tomee:deploy and tomee:undeploy goal -->
+                    <path>${project.build.directory}/apache-tomee/webapps${project.build.finalName}</path>
+                    <args>-Djava.awt.headless=true -Dfile.encoding=UTF-8 -server -Xms2048m -Xmx2048m -XX:PermSize=196m -XX:MaxPermSize=196m -XX:+DisableExplicitGC</args>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.openejb</groupId>
+                        <artifactId>apache-tomee</artifactId>
+                        <version>${tomee.version}</version>
+                        <classifier>${tomee.classifier}</classifier>
+                        <type>zip</type>
+                        <!-- we have to set this to runtime, else it does not work -->
+                        <scope>runtime</scope>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>net.wasdev.wlp.maven.plugins</groupId>
+                <artifactId>liberty-maven-plugin</artifactId>
+                <version>1.1-SNAPSHOT</version>
+                <configuration>
+                    <serverName>defaultServer</serverName>
+                    <configFile>src/main/wlp/server.xml</configFile>
+                    <bootstrapProperties>
+                        <httpPort>9080</httpPort>
+                        <appLocation>../../../../../${project.build.finalName}</appLocation>
+                    </bootstrapProperties>                    
+                    <jvmOptions>
+                        <param>-Djava.awt.headless=true</param>
+                        <param>-Dfile.encoding=UTF-8</param>
+                        <param>-server </param>
+                        <param>-Xms2048m</param>
+                        <param>-Xmx2048m</param>
+                        <param>-XX:PermSize=196m</param>
+                        <param>-XX:MaxPermSize=196m</param>
+                        <param>-XX:+DisableExplicitGC</param>
+                    </jvmOptions>
+                    <install>
+                        <!--    LICENSECODE:
+                            license code for Liberty Profile 8.5.5.4    : L-JTHS-95XRL8
+                            license code for Liberty Profile BETA  2015-01: L-SWIS-9GXN5D
+                            license code for Liberty Profile BETA  2015-02: L-SWIS-9TFM93
+                            you can find the license code in the license documents: 
+                                8.5.5.4: http://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/wasdev/downloads/wlp/8.5.5.4/lafiles/runtime/en.html 
+                                BETA   : http://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/wasdev/downloads/wlp/beta/lafiles/en.html
+                            on the line starting with 'D/N'.
+                        -->
+
+                        <!--    VERSION:
+                            latest released version 8.5.5.x : use '8.5.+'
+                            BETA version: use '2014.+'
+                        -->
+                        
+                        <!--  released Liberty Profile version v8.5.5.4  -->
+                       <!--                          
+                        <licenseCode>L-JTHS-95XRL8</licenseCode>
+                        <version>8.5.+</version>
+                        <runtimeUrl>file:///D:/Apps/IBM/LibertyArchives/wlp-developers-runtime-8.5.5.4.jar</runtimeUrl>                    
+                         -->
+
+                        <!--  BETA 2015-02 Liberty Profile version v9 BETA  -->
+                        
+                        <licenseCode>L-SWIS-9TFM93</licenseCode>
+                        <version>2014.+</version>
+                        <runtimeUrl>file:///D:/Apps/IBM/LibertyArchives/wlp-beta-runtime-2015.2.0.0.jar</runtimeUrl> 
+                        
+
+                    </install>
+                </configuration>
+            </plugin>
+
+        </plugins>
+
     </build>
 
 </project>
