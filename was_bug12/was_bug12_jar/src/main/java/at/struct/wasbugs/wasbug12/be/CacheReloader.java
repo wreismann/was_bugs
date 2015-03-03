@@ -25,6 +25,7 @@ import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
+
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,12 +43,19 @@ public class CacheReloader {
 
     @PostConstruct
     protected void init() {
+        log.log(Level.INFO, "RRR postconstruct called" );
         reload();
     }
 
 
-    @Schedule(hour = "*", minute = "*/1")
+//    @Schedule(hour = "*", minute = "*/1")
+    @Schedule(hour = "*", minute = "*", second = "*/10", persistent=false)
     public void reload() {
+
+    	int c = service.toString().indexOf("CacheUsingService");
+        String id = service.toString().substring(c + "CacheUsingService".length());
+        log.log(Level.INFO, "RRR {0}", id );
+
         log.log(Level.INFO, "Reloading Cache on instance {0}", service);
 
         // know lets do some heavy work

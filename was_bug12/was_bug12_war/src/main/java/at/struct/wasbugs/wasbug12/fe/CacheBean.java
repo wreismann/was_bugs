@@ -50,5 +50,6 @@ public class CacheBean {
 
     public void reload() {
         info = service.getCacheInfo();
+
     }
 }

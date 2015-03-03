@@ -19,8 +19,10 @@
 package at.struct.wasbugs.wasbug12.be;
 
 import javax.enterprise.context.ApplicationScoped;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Date;
 
 @ApplicationScoped
 public class CacheUsingService {
@@ -31,7 +33,10 @@ public class CacheUsingService {
     private volatile SimpleCache cache;
     private volatile int reloads;
 
-
+    public CacheUsingService() {
+        setCache(new SimpleCache(new Date()));
+        reloads = 0;
+    }
 
     public CacheInfo getCacheInfo() {
         log();
@@ -48,6 +53,10 @@ public class CacheUsingService {
 
 
     private void log() {
-        log.log(Level.INFO, "current thread: {0} - value of reloads: {1}, instance {2}", new Object[] {Thread.currentThread().getName(), reloads, this});
+        int c = this.toString().indexOf("CacheUsingService");
+        //String id = this.toString().substring(c);
+        String id = this.toString().substring(c + "CacheUsingService".length());
+        log.log(Level.INFO, "XXX {0} {1} {2}", new Object[]{id,reloads,Thread.currentThread().getName() });
+        log.log(Level.INFO, "current thread: {0} - value of reloads: {1}, instance {2}", new Object[] {Thread.currentThread().getName(), reloads, this, id});
     }
 }
