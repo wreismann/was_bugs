@@ -6,4 +6,4 @@ $> git clone https://github.com/struberg/InterDyn.git
 $> cd InterDyn
 $> mvn clean install
 
-then just compile this very project.
+then just compile this very interesting project.
